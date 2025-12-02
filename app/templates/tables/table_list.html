@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="border-b border-white/10 px-4 py-5 sm:px-6">
+  <div class="-mt-2 -ml-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
+    <div class="mt-2 ml-4">
+      <h3 class="text-base font-semibold text-white">Game tables</h3>
+    </div>
+    <div class="mt-2 ml-4 shrink-0">
+      <a href="{% url 'table_create_view' %}" class="relative inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Create new table</a>
+    </div>
+  </div>
+</div>
+
+<ul role="list" class="divide-y divide-white/5 px-6">
+  {% for item in object_list %}
+  <a href="{% url 'table_object_view' item.pk %}" class="flex justify-between gap-x-6 py-5">
+    <div class="flex min-w-0 gap-x-4">
+      <div class="min-w-0 flex-auto">
+  	<p class="text-sm/6 font-semibold text-white">{{item.name}}</p>
+	{% if item.games.count == 1 %}
+	  <p class="mt-1 truncate text-xs/5 text-gray-400">{{item.games.count}} game</p>
+	{% else %}
+	  <p class="mt-1 truncate text-xs/5 text-gray-400">{{item.games.count}} games</p>
+	{% endif %}
+      </div>
+    </div>
+    <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+      <p class="text-sm/6 text-white">Hosted by {{item.dealer}}</p>
+      <p class="mt-1 text-xs/5 text-gray-400">Created at <time datetime="{{item.play_date}}">{{item.play_date}}</time></p>
+    </div>
+  </a>
+  {% empty %}
+    <div class="text-center py-10">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" class="mx-auto size-12 text-gray-500">
+	<path d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <h3 class="mt-2 text-sm font-semibold text-white">No projects</h3>
+      <p class="mt-1 text-sm text-gray-400">Get started by creating a new project.</p>
+      <div class="mt-6">
+	<button type="button" class="inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+	  Create new table 
+	</button>
+      </div>
+    </div>
+  {% endfor %}
+</ul>
+
+{% if object_list %}
+<nav aria-label="Pagination" class="flex items-center justify-between border-t border-white/10 px-4 py-3 sm:px-6">
+  <div class="hidden sm:block">
+    <p class="text-sm text-gray-300">
+      Page
+      <span class="font-medium">{{page_obj.number}}</span>
+      of
+      <span class="font-medium">{{paginator.num_pages}}</span>
+    </p>
+  </div>
+  <div class="flex flex-1 justify-between sm:justify-end">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-gray-200 inset-ring inset-ring-white/5 hover:bg-white/20">Previous</a>
+    {% endif %}
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" class="relative ml-3 inline-flex items-center rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-gray-200 inset-ring inset-ring-white/5 hover:bg-white/20">next</a>
+    {% endif %}
+
+  </div>
+</nav>
+{% endif %}
+{% endblock %}

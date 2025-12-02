@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tailwind',
     'theme',
+    'widget_tweaks',
+    'games',
+    'tables',
 ]
 
 if DEBUG:

@@ -20,7 +20,8 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/', include("django.contrib.auth.urls"))
+    path('auth/', include("django.contrib.auth.urls")),
+    path('tables/', include("tables.urls")),
 ]
 
 if settings.DEBUG:
