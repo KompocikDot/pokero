@@ -11,6 +11,7 @@ class TableObjectView(DetailView):
 class TablesCreateView(CreateView):
     model = Table
     fields = "__all__"
+    template_name_suffix = "_create_form"
 
 class TableDeleteView(DeleteView):
     model = Table
@@ -19,5 +20,5 @@ class TableDeleteView(DeleteView):
 class TableUpdateView(UpdateView):
     model = Table
     fields = "__all__"
-    template_name_suffix = "_update"
+    template_name_suffix = "_update_form"
 

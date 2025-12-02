@@ -1,4 +1,6 @@
 from django.urls import path
+
+from games.views import GameCreateView
 from .views import TableDeleteView, TableObjectView, TableUpdateView, TablesCreateView, TablesListView
 
 urlpatterns = [
@@ -7,4 +9,5 @@ urlpatterns = [
     path('create/', TablesCreateView.as_view(), name="table_create_view"),
     path('<int:pk>/delete/', TableDeleteView.as_view(), name="table_delete_view"),
     path('<int:pk>/update/', TableUpdateView.as_view(), name="table_update_view"),
+    path('<int:pk>/games/create', GameCreateView.as_view(), name="table_update_view"),
 ]
