@@ -1,12 +1,13 @@
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from tables.models import Table
 from django.shortcuts import get_object_or_404
 
 from .models import Game
 
-class GameCreateView(CreateView):
+class GameCreateView(LoginRequiredMixin, CreateView):
     model = Game
     fields = ["players", "winner"]
     template_name_suffix = "_create_form"
@@ -21,7 +22,7 @@ class GameCreateView(CreateView):
 
         return super().form_valid(form)
 
-class GameUpdateView(UpdateView):
+class GameUpdateView(LoginRequiredMixin, UpdateView):
     model = Game
     fields = ["players", "winner"]
     template_name_suffix = "_update_form"
@@ -31,7 +32,7 @@ class GameUpdateView(UpdateView):
         # pk in that case is a Game.table.pk
         return reverse_lazy('table_object_view', kwargs={"pk": self.kwargs["pk"]})
 
-class GameDeleteView(DeleteView):
+class GameDeleteView(LoginRequiredMixin, DeleteView):
     model = Game
     pk_url_kwarg = "game_pk"
     

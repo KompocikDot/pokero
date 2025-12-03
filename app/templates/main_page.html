@@ -1,1 +1,28 @@
-test main
+{% extends "base.html" %}
+{% block title %}Pokero{% endblock %}
+
+{% block content %}
+<div class="h-full">
+    <div class="mx-auto max-w-7xl h-full">
+      <div class="flex h-full self-center relative z-10">
+        <div class="flex self-center">
+          <div class="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl">
+            <h1 class="text-5xl font-semibold tracking-tight text-pretty text-white sm:text-7xl">Pokero</h1>
+            <p class="mt-8 text-lg font-medium text-pretty text-gray-400 sm:text-xl/8">Keep track of your gambling addiction.</p>
+            <div class="mt-10 flex items-center gap-x-6">
+	      {% if user.is_authenticated %}
+		<a href="{% url 'tables_list_view' %}" class="rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">See your gambling history</a>
+	      {% else %}
+		<a href="{% url 'login' %}" class="rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Get started</a>
+	      {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bg-gray-800 lg:absolute lg:inset-y-0 lg:right-0 lg:w-3/5">
+      <img src="https://igamingpolska.pl/wp-content/uploads/2025/01/1280x720_artykul_.jpg" alt="" class="aspect-3/2 object-cover lg:aspect-auto lg:size-full" />
+    </div>
+</div>
+{% endblock %}
+

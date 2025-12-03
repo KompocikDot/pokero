@@ -111,6 +111,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_URL = "/auth/login/"
+
 LOGIN_REDIRECT_URL = "tables_list_view"
 
 LOGOUT_REDIRECT_URL = "home"

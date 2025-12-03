@@ -1,23 +1,24 @@
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, ListView, DetailView, CreateView, UpdateView
 from .models import Table
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class TablesListView(ListView):
+class TablesListView(LoginRequiredMixin, ListView):
     model = Table
 
-class TableObjectView(DetailView):
+class TableObjectView(LoginRequiredMixin, DetailView):
     model = Table
 
-class TablesCreateView(CreateView):
+class TablesCreateView(LoginRequiredMixin, CreateView):
     model = Table
     fields = "__all__"
     template_name_suffix = "_create_form"
 
-class TableDeleteView(DeleteView):
+class TableDeleteView(LoginRequiredMixin, DeleteView):
     model = Table
     success_url = reverse_lazy('tables_list_view')
 
-class TableUpdateView(UpdateView):
+class TableUpdateView(LoginRequiredMixin, UpdateView):
     model = Table
     fields = "__all__"
     template_name_suffix = "_update_form"
