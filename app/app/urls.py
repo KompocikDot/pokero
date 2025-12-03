@@ -18,9 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 
+from .views import MainPageView, RegisterView
+
 urlpatterns = [
+    path('', MainPageView.as_view(), name="home"),
     path('admin/', admin.site.urls),
     path('auth/', include("django.contrib.auth.urls")),
+    path('auth/signup/', RegisterView.as_view(), name="signup"),
     path('tables/', include("tables.urls")),
 ]
 
