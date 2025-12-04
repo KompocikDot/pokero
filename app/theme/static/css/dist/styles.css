@@ -202,23 +202,11 @@
   .pointer-events-none {
     pointer-events: none;
   }
-  .absolute {
-    position: absolute;
-  }
   .relative {
     position: relative;
   }
   .static {
     position: static;
-  }
-  .inset-0 {
-    inset: calc(var(--spacing) * 0);
-  }
-  .inset-y-0 {
-    inset-block: calc(var(--spacing) * 0);
-  }
-  .right-8 {
-    right: calc(var(--spacing) * 8);
   }
   .z-10 {
     z-index: 10;
@@ -300,9 +288,6 @@
   .min-h-full {
     min-height: 100%;
   }
-  .w-80 {
-    width: calc(var(--spacing) * 80);
-  }
   .w-auto {
     width: auto;
   }
@@ -329,13 +314,6 @@
   }
   .grow {
     flex-grow: 1;
-  }
-  .translate-x-1\/2 {
-    --tw-translate-x: calc(1/2 * 100%);
-    translate: var(--tw-translate-x) var(--tw-translate-y);
-  }
-  .transform {
-    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
   }
   .appearance-none {
     appearance: none;
@@ -443,9 +421,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .rounded-full {
-    border-radius: calc(infinity * 1px);
-  }
   .rounded-md {
     border-radius: var(--radius-md);
   }
@@ -502,9 +477,6 @@
       background-color: color-mix(in oklab, var(--color-white) 10%, transparent);
     }
   }
-  .fill-gray-900 {
-    fill: var(--color-gray-900);
-  }
   .object-cover {
     object-fit: cover;
   }
@@ -525,9 +497,6 @@
   }
   .px-8 {
     padding-inline: calc(var(--spacing) * 8);
-  }
-  .py-1 {
-    padding-block: calc(var(--spacing) * 1);
   }
   .py-1\.5 {
     padding-block: calc(var(--spacing) * 1.5);
@@ -556,14 +525,8 @@
   .py-12 {
     padding-block: calc(var(--spacing) * 12);
   }
-  .py-32 {
-    padding-block: calc(var(--spacing) * 32);
-  }
   .pt-11 {
     padding-top: calc(var(--spacing) * 11);
-  }
-  .pt-14 {
-    padding-top: calc(var(--spacing) * 14);
   }
   .pr-3 {
     padding-right: calc(var(--spacing) * 3);
@@ -681,19 +644,9 @@
     --tw-shadow: 0 1px 2px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.05));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
-  .ring-1 {
-    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
   .inset-ring {
     --tw-inset-ring-shadow: inset 0 0 0 1px var(--tw-inset-ring-color, currentcolor);
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
-  .ring-white\/10 {
-    --tw-ring-color: color-mix(in srgb, #fff 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      --tw-ring-color: color-mix(in oklab, var(--color-white) 10%, transparent);
-    }
   }
   .inset-ring-white\/5 {
     --tw-inset-ring-color: color-mix(in srgb, #fff 5%, transparent);
@@ -771,16 +724,6 @@
       }
     }
   }
-  .hover\:ring-white\/20 {
-    &:hover {
-      @media (hover: hover) {
-        --tw-ring-color: color-mix(in srgb, #fff 20%, transparent);
-        @supports (color: color-mix(in lab, red, red)) {
-          --tw-ring-color: color-mix(in oklab, var(--color-white) 20%, transparent);
-        }
-      }
-    }
-  }
   .focus\:outline-2 {
     &:focus {
       outline-style: var(--tw-outline-style);
@@ -832,11 +775,6 @@
   .sm\:mx-auto {
     @media (width >= 40rem) {
       margin-inline: auto;
-    }
-  }
-  .sm\:mb-10 {
-    @media (width >= 40rem) {
-      margin-bottom: calc(var(--spacing) * 10);
     }
   }
   .sm\:block {
@@ -921,11 +859,6 @@
       padding-inline: calc(var(--spacing) * 6);
     }
   }
-  .sm\:py-40 {
-    @media (width >= 40rem) {
-      padding-block: calc(var(--spacing) * 40);
-    }
-  }
   .sm\:pr-8 {
     @media (width >= 40rem) {
       padding-right: calc(var(--spacing) * 8);
@@ -974,11 +907,6 @@
       margin-inline: calc(var(--spacing) * 0);
     }
   }
-  .lg\:block {
-    @media (width >= 64rem) {
-      display: block;
-    }
-  }
   .lg\:aspect-auto {
     @media (width >= 64rem) {
       aspect-ratio: auto;
@@ -990,19 +918,9 @@
       height: 100%;
     }
   }
-  .lg\:w-1\/2 {
-    @media (width >= 64rem) {
-      width: calc(1/2 * 100%);
-    }
-  }
   .lg\:w-1\/12 {
     @media (width >= 64rem) {
       width: calc(1/12 * 100%);
-    }
-  }
-  .lg\:w-2\/3 {
-    @media (width >= 64rem) {
-      width: calc(2/3 * 100%);
     }
   }
   .lg\:w-2\/12 {
@@ -1020,16 +938,6 @@
       width: calc(4/12 * 100%);
     }
   }
-  .lg\:w-full {
-    @media (width >= 64rem) {
-      width: 100%;
-    }
-  }
-  .lg\:max-w-2xl {
-    @media (width >= 64rem) {
-      max-width: var(--container-2xl);
-    }
-  }
   .lg\:max-w-xl {
     @media (width >= 64rem) {
       max-width: var(--container-xl);
@@ -1040,56 +948,11 @@
       padding-inline: calc(var(--spacing) * 8);
     }
   }
-  .lg\:py-56 {
-    @media (width >= 64rem) {
-      padding-block: calc(var(--spacing) * 56);
-    }
-  }
-  .lg\:pr-0 {
-    @media (width >= 64rem) {
-      padding-right: calc(var(--spacing) * 0);
-    }
-  }
   .lg\:pl-8 {
     @media (width >= 64rem) {
       padding-left: calc(var(--spacing) * 8);
     }
   }
-}
-@property --tw-translate-x {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0;
-}
-@property --tw-translate-y {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0;
-}
-@property --tw-translate-z {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0;
-}
-@property --tw-rotate-x {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-rotate-y {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-rotate-z {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-skew-x {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-skew-y {
-  syntax: "*";
-  inherits: false;
 }
 @property --tw-space-y-reverse {
   syntax: "*";
@@ -1187,14 +1050,6 @@
 @layer properties {
   @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
     *, ::before, ::after, ::backdrop {
-      --tw-translate-x: 0;
-      --tw-translate-y: 0;
-      --tw-translate-z: 0;
-      --tw-rotate-x: initial;
-      --tw-rotate-y: initial;
-      --tw-rotate-z: initial;
-      --tw-skew-x: initial;
-      --tw-skew-y: initial;
       --tw-space-y-reverse: 0;
       --tw-divide-y-reverse: 0;
       --tw-border-style: solid;

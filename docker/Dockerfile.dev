@@ -1,0 +1,44 @@
+FROM python:3.13
+
+EXPOSE 8000
+
+ENV PATH="/backend/.venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
+
+# Copying uv for ease of development.
+COPY --from=docker.io/astral/uv:latest /uv /uvx /bin/
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    unzip \
+    libssl-dev \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -L -o watchman.zip https://github.com/facebook/watchman/releases/download/v2025.11.24.00/watchman-v2025.11.24.00-linux.zip \
+    && unzip watchman.zip \
+    && cd watchman-v2025.11.24.00-linux \
+    && mkdir -p /usr/local/var/run/watchman \
+    && cp bin/* /usr/local/bin/ \
+    && cp lib/* /usr/local/lib/ \
+    && chmod 755 /usr/local/bin/watchman \
+    && chmod 2777 /usr/local/var/run/watchman \
+    && ldconfig \
+    && cd .. \
+    && rm -rf watchman.zip watchman-v2025.11.24.00-linux
+
+WORKDIR /backend
+
+# Base directory where this dockerfile is called is project root.
+COPY ./uv.lock .
+COPY ./pyproject.toml .
+COPY ./app/ ./app
+
+RUN uv sync
+
+
+WORKDIR /backend/app
+
+RUN python manage.py tailwind install
+
+CMD ["python", "manage.py", "tailwind", "dev"]
