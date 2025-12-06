@@ -8,5 +8,6 @@ dependencies = [
     "django>=5.2.8",
     "django-tailwind[cookiecutter,honcho,reload]>=4.4.1",
     "django-widget-tweaks>=1.5.0",
+    "gunicorn>=23.0.0",
     "psycopg>=3.3.1",
 ]
