@@ -1,0 +1,54 @@
+services:
+  app:
+    build:
+      dockerfile: ./docker/Dockerfile.dev
+      secrets:
+        - db_password
+    
+    ports:
+      - "8000:8000"
+
+    tty: true # To keep tailwind refresh on
+
+    develop:
+      watch:
+        - action: sync
+          path: ./app
+          target: /backend/app
+
+        - action: rebuild
+          path: ./uv.lock
+    
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: pokero
+      POSTGRES_DB: pokero
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+
+    secrets:
+      - db_password
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: pokero
+      POSTGRES_DB: pokero
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    
+    secrets:
+      - db_password
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pokero"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+secrets:
+  db_password:
+    file: ./secrets/db_password

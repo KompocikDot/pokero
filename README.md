@@ -1,11 +1,14 @@
 # pokero
 
-### Running a dev environment
+## Running a dev environment
 
 To run a dev environment you'll need:
 
 - docker
 - docker compose (soonish)
+
+Before running you'll need to create these files in secrets directory:
+- db_password
 
 To run docker container run these two commands in main project directory.
 
