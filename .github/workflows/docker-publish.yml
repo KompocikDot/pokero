@@ -30,6 +30,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile.env
+          file: ./docker/Dockerfile.dev
           push: true
           tags: ghcr.io/${{ env.REPO_LOWER }}:latest
