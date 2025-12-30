@@ -9,23 +9,23 @@ ENV PYTHONUNBUFFERED=1
 COPY --from=docker.io/astral/uv:latest /uv /uvx /bin/
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    unzip \
-    libssl-dev \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+	curl \
+	unzip \
+	libssl-dev \
+	ca-certificates \
+	&& rm -rf /var/lib/apt/lists/*
 
 RUN curl -L -o watchman.zip https://github.com/facebook/watchman/releases/download/v2025.11.24.00/watchman-v2025.11.24.00-linux.zip \
-    && unzip watchman.zip \
-    && cd watchman-v2025.11.24.00-linux \
-    && mkdir -p /usr/local/var/run/watchman \
-    && cp bin/* /usr/local/bin/ \
-    && cp lib/* /usr/local/lib/ \
-    && chmod 755 /usr/local/bin/watchman \
-    && chmod 2777 /usr/local/var/run/watchman \
-    && ldconfig \
-    && cd .. \
-    && rm -rf watchman.zip watchman-v2025.11.24.00-linux
+	&& unzip watchman.zip \
+	&& cd watchman-v2025.11.24.00-linux \
+	&& mkdir -p /usr/local/var/run/watchman \
+	&& cp bin/* /usr/local/bin/ \
+	&& cp lib/* /usr/local/lib/ \
+	&& chmod 755 /usr/local/bin/watchman \
+	&& chmod 2777 /usr/local/var/run/watchman \
+	&& ldconfig \
+	&& cd .. \
+	&& rm -rf watchman.zip watchman-v2025.11.24.00-linux
 
 WORKDIR /backend
 
@@ -35,7 +35,6 @@ COPY ./pyproject.toml .
 COPY ./app/ ./app
 
 RUN uv sync
-
 
 WORKDIR /backend/app
 

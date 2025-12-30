@@ -22,6 +22,7 @@ x-common-config: &backend_common
   secrets:
     - db_password
 
+
   depends_on:
     db:
       condition: service_healthy
@@ -45,6 +46,19 @@ services:
       dockerfile: ./docker/Dockerfile
       secrets:
         - db_password
+        - secret_key
+
+    environment:
+      PRODUCTION: true
+      POSTGRES_HOST: db
+      POSTGRES_USER: pokero
+      POSTGRES_DB: pokero
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      SECRET_KEY_FILE: /run/secrets/secret_key
+
+    secrets:
+      - db_password
+      - secret_key
     
     profiles: [prod]
 
@@ -68,3 +82,5 @@ services:
 secrets:
   db_password:
     file: ./secrets/db_password
+  secret_key:
+    file: ./secrets/secret_key

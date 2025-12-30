@@ -19,6 +19,8 @@ RUN uv sync
 
 WORKDIR /backend/app
 
-RUN python manage.py tailwind install && python manage.py tailwind build
+RUN python manage.py tailwind install && \
+	python manage.py tailwind build && \
+	python manage.py collectstatic
 
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "app.wsgi:application"]
+CMD ["gunicorn", "--log-level", "debug", "-b", "0.0.0.0:8000", "app.wsgi:application"]
