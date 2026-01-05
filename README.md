@@ -45,3 +45,22 @@ If you want to detach from running container, simply add `-d` flag like so:
 ```bash
 docker compose -d --profile=dev up
 ```
+
+
+Helm deploy
+Login to Azure and configure kubectl (instruction in pokero_infra rpo)
+
+Example secret and password is provided in ./helm/values.yaml. Change it on production.
+
+```bash
+helm install pokero ./helm
+```
+
+Verify with
+
+```bash
+kubectl get deployments
+kubectl get pods
+```
+
+

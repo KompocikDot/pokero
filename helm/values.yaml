@@ -1,0 +1,30 @@
+# Image
+image:
+  repository: ghcr.io/kompocikdot/pokero
+  tag: latest
+  pullPolicy: Always
+
+# App
+app:
+  replicas: 1
+  port: 8000
+  env:
+    production: "true"
+    postgres_host: "pokero-db" 
+    postgres_port: "5432"
+    postgres_user: "pokero"
+    postgres_db: "pokero"
+
+# Secrets 
+secrets:
+  db_password: "okoń" 
+  secret_key: "boleń"
+
+db:
+  image: postgres:18-alpine
+  storageSize: 1Gi
+
+
+imagePullSecrets:
+  - name: ghcr-secret
+
