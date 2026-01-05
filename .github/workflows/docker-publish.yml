@@ -18,7 +18,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-iac-scan:
+  iac-scan:
     needs: gitleaks
     runs-on: ubuntu-latest
     steps:
