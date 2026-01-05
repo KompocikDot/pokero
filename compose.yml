@@ -55,6 +55,7 @@ services:
       POSTGRES_DB: pokero
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       SECRET_KEY_FILE: /run/secrets/secret_key
+      ALLOWED_HOSTS: '*'
 
     secrets:
       - db_password
