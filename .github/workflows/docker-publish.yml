@@ -50,7 +50,7 @@ jobs:
         run: pip-audit . --verbose
 
   sast-scan:
-    needs: sca-scan 
+    needs: [sca-scan, iac-scan] 
     runs-on: ubuntu-latest
     container:
       image: returntocorp/semgrep 
