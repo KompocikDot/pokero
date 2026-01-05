@@ -33,7 +33,7 @@ jobs:
         run: pip install pip-audit
 
       - name: Run SCA (pip-audit)
-        run: pip-audit
+        run: pip-audit .
 
   build-and-push:
     needs: [gitleaks, sca-scan]
