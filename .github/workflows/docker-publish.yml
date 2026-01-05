@@ -35,3 +35,12 @@ jobs:
       - name: Run SCA (pip-audit)
         run: pip-audit . --verbose
 
+  sast-scan:
+    needs: sca-scan 
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep
+        run: semgrep scan --config auto --error
