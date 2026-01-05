@@ -40,6 +40,13 @@ if DEBUG:
     ALLOWED_HOSTS = ["*"]
 else:
     ALLOWED_HOSTS = []
+    allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', '')
+
+    if allowed_hosts_env:
+        ALLOWED_HOSTS = allowed_hosts_env.split(',')
+
+    #ALLOWED_HOSTS += ['localhost', '127.0.0.1', '0.0.0.0', '[::1]']
+
 
 # Application definition
 
