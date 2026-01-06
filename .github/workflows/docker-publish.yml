@@ -98,7 +98,7 @@ jobs:
           push: true
           tags: ghcr.io/${{ env.REPO_LOWER }}:${{ github.sha }}
 
-            dast-scan:
+  dast-scan:
     needs: build-and-push
     runs-on: ubuntu-latest
     continue-on-error: true 
@@ -117,7 +117,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Dummy Secrets for CI
+      - name: Create Secrets for CI
         run: |
           mkdir -p secrets
           echo "supersecretpassword" > secrets/db_password
