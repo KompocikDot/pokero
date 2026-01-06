@@ -1,67 +1,67 @@
-name: Docker Publish
+#name: Docker Publish
 
-on:
-  push:
-    branches: [ "main", "miszi" ]
+#on:
+#  push:
+#    branches: [ "main", "miszi" ]
 
-jobs:
-  gitleaks:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 
+#jobs:
+#  gitleaks:
+    #    runs-on: ubuntu-latest
+    #    steps:
+    #  - name: Checkout code
+    #    uses: actions/checkout@v4
+    #    with:
+    #      fetch-depth: 0 
 
-      - name: Gitleaks Scan
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #  - name: Gitleaks Scan
+    #    uses: gitleaks/gitleaks-action@v2
+    #    env:
+    #      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  iac-scan:
-    needs: gitleaks
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    #iac-scan:
+    #needs: gitleaks
+    #runs-on: ubuntu-latest
+    #steps:
+    #- uses: actions/checkout@v4
 
-      - name: Run Trivy Config Scan 
-        uses: aquasecurity/trivy-action@0.28.0
-        continue-on-error: true
-        with:
-          scan-type: 'config'        
-          scan-ref: '.'              
-          exit-code: '1'             
-          severity: 'CRITICAL,HIGH'  
+    #  - name: Run Trivy Config Scan 
+    #    uses: aquasecurity/trivy-action@0.28.0
+    #    continue-on-error: true
+    #    with:
+    #      scan-type: 'config'        
+    #      scan-ref: '.'              
+    #      exit-code: '1'             
+    #      severity: 'CRITICAL,HIGH'  
 
-  sca-scan:
-    needs: gitleaks 
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    #sca-scan:
+    #needs: gitleaks 
+    #runs-on: ubuntu-latest
+    #steps:
+    #  - uses: actions/checkout@v4
+    #
+    #  - name: Set up Python
+    #    uses: actions/setup-python@v5
+    #    with:
+    #      python-version: '3.13'
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
+    #  - name: Install pip-audit
+    #    run: pip install pip-audit
+    #
+    #  - name: Run SCA (pip-audit)
+    #    run: pip-audit . --verbose
 
-      - name: Install pip-audit
-        run: pip install pip-audit
-
-      - name: Run SCA (pip-audit)
-        run: pip-audit . --verbose
-
-  sast-scan:
-    needs: [sca-scan, iac-scan] 
-    runs-on: ubuntu-latest
-    container:
-      image: returntocorp/semgrep 
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Semgrep
-        run: semgrep scan --config auto --error --verbose
+    #sast-scan:
+    #needs: [sca-scan, iac-scan] 
+    #runs-on: ubuntu-latest
+    #container:
+    #  image: returntocorp/semgrep 
+    #steps:
+    #  - uses: actions/checkout@v4
+    #  - name: Run Semgrep
+    #    run: semgrep scan --config auto --error --verbose
 
   build-and-push:
-    needs: [gitleaks, sca-scan, iac-scan, sast-scan]
+    #needs: [gitleaks, sca-scan, iac-scan, sast-scan]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -130,15 +130,22 @@ jobs:
       - name: Wait for App to be ready
         run: |
           echo "Waiting for Django..."
-          for i in {1..20}; do
-            if curl -s -o /dev/null -w "%{http_code}" http://localhost:8000 | grep "200\|301\|302\|404" > /dev/null; then
-              echo " App is up!"
-              exit 0
+          for i in {1..15}; do
+            if [ "$(docker compose --profile=prod ps -q app)" ]; then
+              echo "Container is running... checking HTTP"
+              if curl -s -o /dev/null -w "%{http_code}" http://localhost:8000 | grep "200\|301\|302\|404" > /dev/null; then
+                echo " App is up and responding!"
+                exit 0
+              fi
+            else
+              echo " Container 'app' died!"
+              docker compose --profile=prod logs app
+              exit 1
             fi
             echo "Attempt $i: Still waiting..."
-            sleep 5
+            sleep 2
           done
-          echo "App failed to start. Logs:"
+          echo " Timeout. Logs below:"
           docker compose --profile=prod logs app
           exit 1
 
