@@ -1,10 +1,10 @@
-#name: Docker Publish
+name: Docker Publish
 
-#on:
-#  push:
-#    branches: [ "main", "miszi" ]
+on:
+  push:
+    branches: [ "main", "miszi" ]
 
-#jobs:
+jobs:
 #  gitleaks:
     #    runs-on: ubuntu-latest
     #    steps:
