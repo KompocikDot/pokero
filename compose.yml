@@ -42,6 +42,8 @@ services:
   app:
     <<: *backend_common 
     
+    image: ${DOCKER_IMAGE:-pokero-prod}
+
     build:
       dockerfile: ./docker/Dockerfile
       secrets:
