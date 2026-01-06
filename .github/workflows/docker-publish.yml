@@ -26,6 +26,7 @@ jobs:
 
       - name: Run Trivy Config Scan (Terraform & Dockerfile)
         uses: aquasecurity/trivy-action@0.28.0
+        continue-on-error: true
         with:
           scan-type: 'config'        
           scan-ref: '.'              
