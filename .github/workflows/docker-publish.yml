@@ -125,7 +125,7 @@ jobs:
       - name: Run Migrations
         run: |
           sleep 5
-          docker compose --profile=prod exec -T app python manage.py migrate --noinput
+          docker compose --profile=prod logs app
 
       - name: Wait for App to be ready
         run: |
