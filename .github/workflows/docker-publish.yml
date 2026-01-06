@@ -32,6 +32,14 @@ jobs:
           exit-code: '1'             
           severity: 'CRITICAL,HIGH'  
 
+      - name: Run Trivy Helm scan
+        uses:  aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'config'        
+          scan-ref: './pokero/helm'              
+          exit-code: '1'             
+          severity: 'CRITICAL,HIGH'  
+
   sca-scan:
     needs: gitleaks 
     runs-on: ubuntu-latest
