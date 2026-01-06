@@ -16,9 +16,7 @@ app:
     postgres_db: "pokero"
 
 # Secrets 
-secrets:
-  db_password: "okoń" 
-  secret_key: "boleń"
+secrets: {}
 
 db:
   image: postgres:18-alpine
