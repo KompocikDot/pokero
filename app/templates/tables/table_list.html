@@ -38,9 +38,9 @@
       <h3 class="mt-2 text-sm font-semibold text-white">No projects</h3>
       <p class="mt-1 text-sm text-gray-400">Get started by creating a new project.</p>
       <div class="mt-6">
-	<button type="button" class="inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+	<a href="{% url 'table_create_view' %}" class="inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
 	  Create new table 
-	</button>
+	</a>
       </div>
     </div>
   {% endfor %}
