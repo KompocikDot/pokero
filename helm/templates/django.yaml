@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: pokero-app
 spec:
-  type: LoadBalancer # Na AKS to wystawi publiczne IP. Dla produkcji lepiej użyć Ingress.
+  type: ClusterIP 
   ports:
-    - port: 80
+    - port: 8000
       targetPort: 8000
   selector:
     app: pokero-app
