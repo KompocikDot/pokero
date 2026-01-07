@@ -164,6 +164,7 @@ jobs:
           token: ${{ github.token }}
           issue_title: 'ZAP Security Alert'
           fail_action: true 
+          artifact_name: 'zap-scan-report'
 
       - name: Stop services
         if: always()

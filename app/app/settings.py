@@ -70,9 +70,9 @@ if DEBUG:
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'csp.middleware.CSPMiddleware',
     'app.middleware.SecurityHeadersMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -202,5 +202,8 @@ CONTENT_SECURITY_POLICY = {
         "img-src": ["'self'", "data:", "https://igamingpolska.pl", "https://tailwindcss.com"],
         "font-src": ["'self'", "https://fonts.gstatic.com"],
         "connect-src": ["'self'"], 
+        "frame-src": ["'self'"],
+        "object-src": ["'none'"],
+        "base-uri": ["'self'"],
     }
 }
