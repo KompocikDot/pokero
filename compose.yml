@@ -42,11 +42,17 @@ services:
   app:
     <<: *backend_common 
     
+    image: ${DOCKER_IMAGE:-pokero-prod}
+
     build:
       dockerfile: ./docker/Dockerfile
       secrets:
         - db_password
         - secret_key
+
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
 
     environment:
       PRODUCTION: true

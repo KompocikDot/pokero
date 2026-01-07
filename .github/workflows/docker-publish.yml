@@ -2,11 +2,72 @@ name: Docker Publish
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "miszi", "helm" ]
 
 jobs:
-  build-and-push:
+  gitleaks:
     runs-on: ubuntu-latest
+    continue-on-error: true 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  iac-scan:
+    needs: gitleaks
+    runs-on: ubuntu-latest
+    continue-on-error: true 
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy Config Scan
+        uses: aquasecurity/trivy-action@0.28.0
+        
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+  sca-scan:
+    needs: gitleaks
+    runs-on: ubuntu-latest
+    continue-on-error: true 
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Run SCA (pip-audit)
+        run: pip-audit . --verbose
+
+  sast-scan:
+    needs: [sca-scan, iac-scan]
+    runs-on: ubuntu-latest
+    continue-on-error: true 
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep
+        run: semgrep scan --config auto --error --verbose
+
+  build-and-push:
+    needs: [gitleaks, sca-scan, iac-scan, sast-scan]
+    runs-on: ubuntu-latest
+    continue-on-error: true 
     permissions:
       contents: read
       packages: write
@@ -32,4 +93,79 @@ jobs:
           context: .
           file: ./docker/Dockerfile.dev
           push: true
-          tags: ghcr.io/${{ env.REPO_LOWER }}:latest
+          tags: ghcr.io/${{ env.REPO_LOWER }}:${{ github.sha }}
+
+  dast-scan:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    continue-on-error: true 
+    permissions:
+      contents: read
+      issues: write 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lowercase repo name
+        run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Secrets for CI
+        run: |
+          mkdir -p secrets
+          echo "supersecretpassword" > secrets/db_password
+          echo "django-insecure-test-key-for-ci" > secrets/secret_key
+
+      - name: Start services with Docker Compose
+        env:
+          DOCKER_IMAGE: ghcr.io/${{ env.REPO_LOWER }}:${{ github.sha }}
+        run: |
+          echo "Using image: $DOCKER_IMAGE"
+          docker compose --profile=prod up -d
+
+      - name: Check Startup Logs
+        run: |
+          sleep 5
+          docker compose --profile=prod logs app
+
+      - name: Wait for App to be ready
+        run: |
+          echo "Waiting for Django..."
+          for i in {1..20}; do
+            if [ "$(docker compose --profile=prod ps -q app)" ]; then
+              echo "Container is running... checking HTTP"
+              if curl -s -o /dev/null -w "%{http_code}" http://localhost:8000 | grep "200\|301\|302\|404" > /dev/null; then
+                echo " App is up and responding!"
+                exit 0
+              fi
+            else
+              echo " Container 'app' died!"
+              docker compose --profile=prod logs app
+              exit 1
+            fi
+            echo "Attempt $i: Still waiting..."
+            sleep 3
+          done
+          echo " Timeout. Logs below:"
+          docker compose --profile=prod logs app
+          exit 1
+
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:8000'
+          token: ${{ github.token }}
+          issue_title: 'ZAP Security Alert'
+          fail_action: true 
+          artifact_name: 'zap-scan-report'
+
+      - name: Stop services
+        if: always()
+        run: docker compose --profile=prod down

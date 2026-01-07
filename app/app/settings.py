@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'games',
     'tables',
+    'csp',
 ]
 
 if DEBUG:
@@ -70,6 +71,8 @@ if DEBUG:
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'csp.middleware.CSPMiddleware',
+    'app.middleware.SecurityHeadersMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -168,3 +171,39 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TAILWIND_APP_NAME = "theme"
+
+if not DEBUG:
+    # 1. Ochrona Ciasteczek (Naprawia: Cookie No HttpOnly Flag)
+    # Zapobiega wykradaniu sesji przez skrypty JS (XSS)
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+
+    # UWAGA: Włączaj flagi SECURE tylko jeśli masz HTTPS.
+    # W CI/CD (localhost) ZAP testuje po HTTP, więc włączenie tego
+    # sprawi, że logowanie przestanie działać (ciasteczko zostanie odrzucone).
+    # Na "prawdziwej produkcji" z domeną i kłódką SSL odkomentuj te linie:
+    # SESSION_COOKIE_SECURE = True
+    # CSRF_COOKIE_SECURE = True
+    # SECURE_SSL_REDIRECT = True
+    # SECURE_HSTS_SECONDS = 31536000
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+    # 2. Izolacja Strony (Naprawia: Insufficient Site Isolation / Spectre)
+    # Wymaga Django 4.0+
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
+    # 3. Content Security Policy (Naprawia: CSP Header Not Set)
+    # Konfiguracja biblioteki django-csp
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": ["'self'"],
+        "script-src": ["'self'"],
+        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        "img-src": ["'self'", "data:", "https://igamingpolska.pl", "https://tailwindcss.com"],
+        "font-src": ["'self'", "https://fonts.gstatic.com"],
+        "connect-src": ["'self'"], 
+        "frame-src": ["'self'"],
+        "object-src": ["'none'"],
+        "base-uri": ["'self'"],
+    }
+}

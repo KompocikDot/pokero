@@ -23,4 +23,8 @@ RUN python manage.py tailwind install && \
 	python manage.py tailwind build && \
 	python manage.py collectstatic
 
+RUN useradd -m -u 1000 appuser
+
+USER appuser
+
 CMD ["gunicorn", "--log-level", "debug", "-b", "0.0.0.0:8000", "app.wsgi:application"]
