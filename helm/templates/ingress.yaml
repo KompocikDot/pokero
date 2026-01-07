@@ -6,6 +6,10 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - pokerteki.mom
+      secretName: pokero-tls-secret
   rules:
     - http:
         paths:
