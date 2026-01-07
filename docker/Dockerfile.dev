@@ -8,6 +8,7 @@ ENV PYTHONUNBUFFERED=1
 # Copying uv for ease of development.
 COPY --from=docker.io/astral/uv:latest /uv /uvx /bin/
 
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
 	curl \
 	unzip \
@@ -27,6 +28,8 @@ RUN curl -L -o watchman.zip https://github.com/facebook/watchman/releases/downlo
 	&& cd .. \
 	&& rm -rf watchman.zip watchman-v2025.11.24.00-linux
 
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
 WORKDIR /backend
 
 # Base directory where this dockerfile is called is project root.
@@ -40,8 +43,8 @@ WORKDIR /backend/app
 
 RUN python manage.py tailwind install
 
-#RUN useradd -m -u 1000 appuser
+RUN chown -R appuser:appuser /backend
 
-#USER appuser
+USER appuser
 
 CMD ["python", "manage.py", "tailwind", "dev"]

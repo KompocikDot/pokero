@@ -50,6 +50,10 @@ services:
         - db_password
         - secret_key
 
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+
     environment:
       PRODUCTION: true
       POSTGRES_HOST: db
