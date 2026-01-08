@@ -14,8 +14,9 @@ class TablesListView(LoginRequiredMixin, ListView):
             Q(dealer=user) | Q(games__players=user)
         ).distinct()
 
-class TableObjectView(LoginRequiredMixin, DetailView):
+class TableObjectView(PermissionRequiredMixin, LoginRequiredMixin, DetailView):
     model = Table
+    permission_required = "tables.read_table"
 
 class TablesCreateView(LoginRequiredMixin, CreateView):
     model = Table

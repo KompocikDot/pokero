@@ -95,15 +95,21 @@
 	      </td>
 	      <td class="hidden py-4 pr-4 pl-0 sm:table-cell sm:pr-8">
 	        <div class="flex gap-x-3">
-		  <a href="{% url 'game_update_view' object.pk game.pk %}" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Update game</a>
+	  	  {% has_perm "games.change_game" user game as can_change_game %}
+	          {% if can_change_game %}
+	     	    <a href="{% url 'game_update_view' object.pk game.pk %}" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Update game</a>
+	          {% endif %}
 		</div>
 	      </td>
 	       <td class="hidden py-4 pr-4 pl-0 sm:table-cell sm:pr-8">
 	        <div class="flex gap-x-3">
+		  {% has_perm "games.delete_game" user game as can_delete_game %}
+	          {% if can_delete_game %}
 		  <form method="post" action={% url 'game_delete_view' object.pk game.pk %}>
 	          {% csrf_token %}
 	            <button type="submit" class="self-end relative inline-flex items-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">Delete game</button>
 	          </form>
+		  {% endif %}
 		</div>
 	      </td>
 	    </tr>
