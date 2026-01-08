@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: pokero-app
 spec:
-  type: LoadBalancer # Na AKS to wystawi publiczne IP. Dla produkcji lepiej użyć Ingress.
+  type: ClusterIP 
   ports:
-    - port: 80
+    - port: 8000
       targetPort: 8000
   selector:
     app: pokero-app
@@ -28,6 +28,13 @@ spec:
         - name: django
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            requests: 
+              cpu: {{ .Values.app.resources.requests.cpu }}
+              memory: {{ .Values.app.resources.requests.memory }} 
+            limits:
+              cpu: {{ .Values.app.resources.limits.cpu }}
+              memory: {{ .Values.app.resources.limits.memory }}
           command:
             - "/bin/sh"
             - "-c"
