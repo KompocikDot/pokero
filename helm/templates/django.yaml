@@ -24,6 +24,8 @@ spec:
       labels:
         app: pokero-app
     spec:
+      securityContext:
+        runAsNonRoot: true
       containers:
         - name: django
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
