@@ -33,6 +33,8 @@ spec:
       labels:
         app: pokero-db
     spec:
+      securityContext:
+        fsGroup: 70
       containers:
         - name: postgres
           image: {{ .Values.db.image }}
@@ -43,6 +45,15 @@ spec:
             limits:
               cpu: {{ .Values.db.resources.limits.cpu }}
               memory: {{ .Values.db.resources.limits.memory }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 70
+            runAsGroup: 70
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           ports:
             - containerPort: 5432
           env:
@@ -58,6 +69,10 @@ spec:
             - name: secrets
               mountPath: /etc/secrets
               readOnly: true
+            - name: run-volume
+              mountPath: /var/run/postgresql
+            - name: tmp-volume
+              mountPath: /tmp
       volumes:
         - name: db-data
           persistentVolumeClaim:
@@ -65,3 +80,7 @@ spec:
         - name: secrets
           secret:
             secretName: pokero-secrets
+        - name: run-volume
+          emptyDir: {}
+        - name: tmp-volume
+          emptyDir: {}
