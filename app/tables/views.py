@@ -3,9 +3,16 @@ from django.views.generic import DeleteView, ListView, DetailView, CreateView, U
 from .models import Table
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rules.contrib.views import PermissionRequiredMixin
+from django.db.models import Q
 
 class TablesListView(LoginRequiredMixin, ListView):
     model = Table
+
+    def get_queryset(self):
+        user = self.request.user
+        return Table.objects.filter(
+            Q(dealer=user) | Q(games__players=user)
+        ).distinct()
 
 class TableObjectView(LoginRequiredMixin, DetailView):
     model = Table
