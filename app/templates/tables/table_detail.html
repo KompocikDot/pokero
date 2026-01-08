@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load rules %}
 
 {% block content %}
 <div class="border-b border-white/10 px-4 py-5 sm:px-6">
@@ -24,12 +25,19 @@
 	  </div>
         </div>
 	<div>
+	  {% has_perm "tables.change_table" user object as can_update_table %}
           <div class="flex gap-x-3">
-	    <a href="{% url 'table_update_view' object.pk %}" class="self-end relative inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">update table details</a>
-	    <form method="post" action={% url 'table_delete_view' object.pk %}>
+            {% if can_update_table %}
+	      <a href="{% url 'table_update_view' object.pk %}" class="self-end relative inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">update table details</a>
+	    {% endif %}
+
+	    {% has_perm "tables.delete_table" user object as can_delete_table %}
+            {% if can_delete_table %}
+	    <form method="post" action="{% url 'table_delete_view' object.pk %}">
 	      {% csrf_token %}
 	      <button type="submit" class="self-end relative inline-flex items-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">delete table</button>
 	    </form>
+          {% endif %}
           </div>
         </div>
       </div>
@@ -53,7 +61,10 @@
     <div class="border-t border-white/10 pt-11">
       <div class="flex justify-between px-8">
         <h2 class="text-base/7 font-semibold text-white">Games list</h2>
-	<a href="{% url 'game_create_view' object.pk %}" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Add game</a>
+	{% has_perm "tables.change_table" user object as can_create_game %}
+	{% if can_create_game %}
+	  <a href="{% url 'game_create_view' object.pk %}" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Add game</a>
+	{% endif %}
       </div>
       <table class="mt-6 w-full text-left whitespace-nowrap">
         <colgroup>
