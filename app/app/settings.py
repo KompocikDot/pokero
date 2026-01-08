@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'games',
     'tables',
     'csp',
+    "rules"
 ]
 
 if DEBUG:
@@ -82,10 +83,17 @@ MIDDLEWARE = [
 
 ]
 
+
+
 if DEBUG:
     MIDDLEWARE += [
         "django_browser_reload.middleware.BrowserReloadMiddleware",
     ]
+
+AUTHENTICATION_BACKENDS = (
+    'rules.permissions.ObjectPermissionBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 ROOT_URLCONF = 'app.urls'
 
