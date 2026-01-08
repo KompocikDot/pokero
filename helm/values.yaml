@@ -15,6 +15,14 @@ app:
     postgres_user: "pokero"
     postgres_db: "pokero"
 
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
 # Secrets 
 secrets: {}
 
@@ -22,18 +30,19 @@ db:
   image: postgres:18-alpine
   storageSize: 1Gi
 
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+
 
 imagePullSecrets:
   - name: ghcr-secret
 
 
-resources:
-  requests:
-    cpu: "100m"
-    memory: "128Mi"
-  limits:
-    cpu: "500m"
-    memory: "512Mi"
 
 autoscaling:
   enabled: true
