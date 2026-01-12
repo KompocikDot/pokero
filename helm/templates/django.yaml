@@ -3,9 +3,9 @@ kind: Service
 metadata:
   name: pokero-app
 spec:
-  type: LoadBalancer # Na AKS to wystawi publiczne IP. Dla produkcji lepiej użyć Ingress.
+  type: ClusterIP 
   ports:
-    - port: 80
+    - port: 8000
       targetPort: 8000
   selector:
     app: pokero-app
@@ -24,10 +24,28 @@ spec:
       labels:
         app: pokero-app
     spec:
+      securityContext:
+        runAsNonRoot: true
       containers:
         - name: django
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            requests: 
+              cpu: {{ .Values.app.resources.requests.cpu }}
+              memory: {{ .Values.app.resources.requests.memory }} 
+            limits:
+              cpu: {{ .Values.app.resources.limits.cpu }}
+              memory: {{ .Values.app.resources.limits.memory }}
           command:
             - "/bin/sh"
             - "-c"
@@ -45,22 +63,27 @@ spec:
               value: {{ .Values.app.env.postgres_user }}
             - name: POSTGRES_DB
               value: {{ .Values.app.env.postgres_db }}
-            # Wskazujemy na pliki w zamontowanym wolumenie
             - name: POSTGRES_PASSWORD_FILE
               value: /etc/secrets/db_password
             - name: SECRET_KEY_FILE
               value: /etc/secrets/secret_key
-            # Automatyczne ALLOWED_HOSTS (pobiera IP poda, ale dodajemy * dla LB)
             - name: ALLOWED_HOSTS
               value: "*" 
-          # Montujemy sekret jako pliki
           volumeMounts:
             - name: secrets
               mountPath: /etc/secrets
               readOnly: true
+            - name: tmp-volume
+              mountPath: /tmp
+            - name: static-volume
+              mountPath: /backend/app/staticfiles
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets | first | pluck "name" | first }}
       volumes:
         - name: secrets
           secret:
             secretName: pokero-secrets
+        - name: tmp-volume
+          emptyDir: {}
+        - name: static-volume
+          emptyDir: {}

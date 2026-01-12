@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-migrate
+  labels:
+    app: pokero-migrate
+  annotations:
+    "helm.sh/hook": post-install,pre-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "-5"
+spec:
+  template:
+    metadata:
+      labels:
+        app: pokero-migrate
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: migration
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python", "manage.py", "migrate"]
+          
+          env:
+            - name: POSTGRES_HOST
+              value: {{ .Values.app.env.postgres_host }}
+            - name: POSTGRES_PORT
+              value: {{ .Values.app.env.postgres_port | quote }}
+            - name: POSTGRES_USER
+              value: {{ .Values.app.env.postgres_user }}
+            - name: POSTGRES_DB
+              value: {{ .Values.app.env.postgres_db }}
+            - name: POSTGRES_PASSWORD_FILE
+              value: /etc/secrets/db_password
+            - name: SECRET_KEY_FILE
+              value: /etc/secrets/secret_key
+          
+          volumeMounts:
+            - name: secrets
+              mountPath: /etc/secrets
+              readOnly: true
+      
+      volumes:
+        - name: secrets
+          secret:
+            secretName: pokero-secrets
