@@ -1,0 +1,38 @@
+
+loki:
+  enabled: true
+  isDefault: false
+
+promtail:
+  enabled: true
+  config:
+    lokiAddress: http://{{ .Release.Name }}-loki:3100/loki/api/v1/push
+
+grafana:
+  enabled: true
+  sidecar:
+    datasources:
+      enabled: true
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      uid: loki
+      access: proxy
+      url: http://loki-stack.monitoring.svc.cluster.local:3100
+      jsonData:
+        maxLines: 1000
+    - name: Prometheus
+      type: prometheus
+      uid: prometheus
+      access: proxy
+      url: http://loki-stack-prometheus-server.monitoring.svc.cluster.local:80
+
+prometheus:
+  enabled: true
+  alertmanager:
+    enabled: false
+  pushgateway:
+    enabled: false
+  server:
+    persistentVolume:
+      enabled: false
