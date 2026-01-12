@@ -64,3 +64,46 @@ kubectl get pods
 ```
 
 
+
+## Deploy logging stack (do only once)
+```bash
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo add falcosecurity https://falcosecurity.github.io/charts
+helm repo update
+
+helm upgrade --install loki-stack grafana/loki-stack \
+  --namespace monitoring \
+  --create-namespace \
+  -f infra/monitoring-values.yaml
+
+helm upgrade --install falco falcosecurity/falco \
+  --namespace falco \
+  --create-namespace \
+  -f infra/falco-values.yaml
+```
+
+
+## Port forward to access Grafana
+```
+ssh -L 3000:127.0.0.1:3000 uzytkownik@adres-twojej-maszyny-vm
+```
+
+```
+kubectl port-forward --namespace monitoring service/loki-stack-grafana 3000:80
+```
+
+
+## Add grafana dashboard from file
+
+```bash
+kubectl create configmap grafana-dashboard-pods \
+  --namespace monitoring \
+  --from-file=infra/pod-dashboard.json \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+
+kubectl label configmap grafana-dashboard-pods \
+  --namespace monitoring \
+  grafana_dashboard=1 \
+  --overwrite
+```
