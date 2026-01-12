@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:pk>/delete/', TableDeleteView.as_view(), name="table_delete_view"),
     path('<int:pk>/update/', TableUpdateView.as_view(), name="table_update_view"),
     path('<int:pk>/games/', include("games.urls")),
+    path('<int:pk>/comments/', include("comments.urls")),
 ]
