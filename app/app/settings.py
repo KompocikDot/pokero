@@ -215,6 +215,5 @@ CONTENT_SECURITY_POLICY = {
         "base-uri": ["'self'"],
     }
 }
-
 if not DEBUG:
     CSRF_TRUSTED_ORIGINS = ["https://pokerteki.mom"]
