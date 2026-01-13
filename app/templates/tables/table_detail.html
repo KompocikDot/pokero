@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load rules %}
-
 {% block content %}
 <div class="border-b border-white/10 px-4 py-5 sm:px-6">
   <div class="-mt-2 -ml-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
@@ -15,106 +14,139 @@
     </div>
   </div>
 </div>
-    <header>
-      <div class="flex flex-col items-start justify-between gap-x-8 gap-y-4 bg-gray-700/10 px-4 py-4 sm:flex-row sm:items-center sm:px-6 lg:px-8">
-        <div>
-          <div class="flex gap-x-3">
-            <h1 class="flex gap-x-3 text-base/7">
-	      <span class="font-semibold text-white">{{object.name}}</span>
-            </h1>
-	  </div>
-        </div>
-	<div>
-	  {% has_perm "tables.change_table" user object as can_update_table %}
-          <div class="flex gap-x-3">
-            {% if can_update_table %}
-	      <a href="{% url 'table_update_view' object.pk %}" class="self-end relative inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">update table details</a>
-	    {% endif %}
-
-	    {% has_perm "tables.delete_table" user object as can_delete_table %}
-            {% if can_delete_table %}
-	    <form method="post" action="{% url 'table_delete_view' object.pk %}">
-	      {% csrf_token %}
-	      <button type="submit" class="self-end relative inline-flex items-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">delete table</button>
-	    </form>
-          {% endif %}
-          </div>
-        </div>
+<header>
+  <div class="flex flex-col items-start justify-between gap-x-8 gap-y-4 bg-gray-700/10 px-4 py-4 sm:flex-row sm:items-center sm:px-6 lg:px-8">
+    <div>
+      <div class="flex gap-x-3">
+        <h1 class="flex gap-x-3 text-base/7">
+          <span class="font-semibold text-white">{{object.name}}</span>
+        </h1>
       </div>
-
-      <div class="grid bg-gray-700/10 grid-cols-2">
-        <div class="border-t border-white/5 px-4 py-6 sm:px-6 lg:px-8">
-          <p class="text-sm/6 font-medium text-gray-400">Number of games</p>
-          <p class="mt-2 flex items-baseline gap-x-2">
-	  <span class="text-4xl font-semibold tracking-tight text-white">{{object.games.count}}</span>
-          </p>
-        </div>
-        <div class="border-t border-white/5 px-4 py-6 sm:border-l sm:px-6 lg:px-8">
-          <p class="text-sm/6 font-medium text-gray-400">Dealer</p>
-          <p class="mt-2 flex items-baseline gap-x-2">
-	  <span class="text-4xl font-semibold tracking-tight text-white">{{object.dealer}}</span>
-          </p>
-        </div>
-      </div>
-    </header>
-
-    <div class="border-t border-white/10 pt-11">
-      <div class="flex justify-between px-8">
-        <h2 class="text-base/7 font-semibold text-white">Games list</h2>
-	{% has_perm "tables.change_table" user object as can_create_game %}
-	{% if can_create_game %}
-	  <a href="{% url 'game_create_view' object.pk %}" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Add game</a>
-	{% endif %}
-      </div>
-      <table class="mt-6 w-full text-left whitespace-nowrap">
-        <colgroup>
-          <col class="w-full sm:w-4/12" />
-          <col class="lg:w-4/12" />
-          <col class="lg:w-2/12" />
-          <col class="lg:w-1/12" />
-          <col class="lg:w-1/12" />
-        </colgroup>
-        <thead class="border-b border-white/10 text-sm/6 text-white">
-          <tr>
-            <th scope="col" class="py-2 pr-8 pl-4 font-semibold sm:pl-6 lg:pl-8">Game number</th>
-            <th scope="col" class="hidden py-2 pr-8 pl-0 font-semibold sm:table-cell">Winner</th>
-            <th scope="col" class="hidden py-2 pr-8 pl-0 font-semibold sm:table-cell"></th>
-            <th scope="col" class="hidden py-2 pr-8 pl-0 font-semibold sm:table-cell"></th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-white/5">
-	  {% for game in object.games.all %}
-	    <tr>
-	      <td class="py-4 pr-8 pl-4 sm:pl-6 lg:pl-8">
-		<div class="truncate text-sm/6 font-medium text-white">{{forloop.counter}}</div>
-	      </td>
-	      <td class="hidden py-4 pr-4 pl-0 sm:table-cell sm:pr-8">
-	        <div class="flex gap-x-3">
-		  <div class="font-mono text-sm/6 text-gray-400">{{game.winner}}</div>
-		</div>
-	      </td>
-	      <td class="hidden py-4 pr-4 pl-0 sm:table-cell sm:pr-8">
-	        <div class="flex gap-x-3">
-	  	  {% has_perm "games.change_game" user game as can_change_game %}
-	          {% if can_change_game %}
-	     	    <a href="{% url 'game_update_view' object.pk game.pk %}" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Update game</a>
-	          {% endif %}
-		</div>
-	      </td>
-	       <td class="hidden py-4 pr-4 pl-0 sm:table-cell sm:pr-8">
-	        <div class="flex gap-x-3">
-		  {% has_perm "games.delete_game" user game as can_delete_game %}
-	          {% if can_delete_game %}
-		  <form method="post" action={% url 'game_delete_view' object.pk game.pk %}>
-	          {% csrf_token %}
-	            <button type="submit" class="self-end relative inline-flex items-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">Delete game</button>
-	          </form>
-		  {% endif %}
-		</div>
-	      </td>
-	    </tr>
-	  {% endfor %}
-        </tbody>
-      </table>
     </div>
+    <div>
+      {% has_perm "tables.change_table" user object as can_update_table %}
+      <div class="flex gap-x-3">
+        {% if can_update_table %}
+        <a href="{% url 'table_update_view' object.pk %}" class="self-end relative inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">update table details</a>
+        {% endif %}
+        {% has_perm "tables.delete_table" user object as can_delete_table %}
+        {% if can_delete_table %}
+        <form method="post" action="{% url 'table_delete_view' object.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="self-end relative inline-flex items-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">delete table</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="grid bg-gray-700/10 grid-cols-2">
+    <div class="border-t border-white/5 px-4 py-6 sm:px-6 lg:px-8">
+      <p class="text-sm/6 font-medium text-gray-400">Number of games</p>
+      <p class="mt-2 flex items-baseline gap-x-2">
+        <span class="text-4xl font-semibold tracking-tight text-white">{{object.games.count}}</span>
+      </p>
+    </div>
+    <div class="border-t border-white/5 px-4 py-6 sm:border-l sm:px-6 lg:px-8">
+      <p class="text-sm/6 font-medium text-gray-400">Dealer</p>
+      <p class="mt-2 flex items-baseline gap-x-2">
+        <span class="text-4xl font-semibold tracking-tight text-white">{{object.dealer}}</span>
+      </p>
+    </div>
+  </div>
+</header>
+<div class="border-t border-white/10 pt-11">
+  <div class="flex justify-between px-8">
+    <h2 class="text-base/7 font-semibold text-white">Games list</h2>
+    {% has_perm "tables.change_table" user object as can_create_game %}
+    {% if can_create_game %}
+    <a href="{% url 'game_create_view' object.pk %}" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Add game</a>
+    {% endif %}
+  </div>
+  <table class="mt-6 w-full text-left whitespace-nowrap max-h-24 overflow-x-scroll">
+    <colgroup>
+      <col class="w-full sm:w-4/12" />
+      <col class="lg:w-4/12" />
+      <col class="lg:w-2/12" />
+      <col class="lg:w-1/12" />
+      <col class="lg:w-1/12" />
+    </colgroup>
+    <thead class="border-b border-white/10 text-sm/6 text-white">
+      <tr>
+        <th scope="col" class="py-2 pr-8 pl-4 font-semibold sm:pl-6 lg:pl-8">Game number</th>
+        <th scope="col" class="hidden py-2 pr-8 pl-0 font-semibold sm:table-cell">Winner</th>
+        <th scope="col" class="hidden py-2 pr-8 pl-0 font-semibold sm:table-cell"></th>
+        <th scope="col" class="hidden py-2 pr-8 pl-0 font-semibold sm:table-cell"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-white/5">
+      {% for game in object.games.all %}
+      <tr>
+        <td class="py-4 pr-8 pl-4 sm:pl-6 lg:pl-8">
+          <div class="truncate text-sm/6 font-medium text-white">{{forloop.counter}}</div>
+        </td>
+        <td class="hidden py-4 pr-4 pl-0 sm:table-cell sm:pr-8">
+          <div class="flex gap-x-3">
+            <div class="font-mono text-sm/6 text-gray-400">{{game.winner}}</div>
+          </div>
+        </td>
+        <td class="hidden py-4 pr-4 pl-0 sm:table-cell sm:pr-8">
+          <div class="flex gap-x-3">
+            {% has_perm "games.change_game" user game as can_change_game %}
+            {% if can_change_game %}
+            <a href="{% url 'game_update_view' object.pk game.pk %}" class="rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Update game</a>
+            {% endif %}
+          </div>
+        </td>
+        <td class="hidden py-4 pr-4 pl-0 sm:table-cell sm:pr-8">
+          <div class="flex gap-x-3">
+            {% has_perm "games.delete_game" user game as can_delete_game %}
+            {% if can_delete_game %}
+            <form method="post" action={% url 'game_delete_view' object.pk game.pk %}>
+            {% csrf_token %}
+            <button type="submit" class="self-end relative inline-flex items-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">Delete game</button>
+            </form>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="border-t border-white/10 pt-11">
+  <section class="bg-white dark:bg-gray-900 py-8 lg:py-16 antialiased">
+    <div class="max-w-2xl mx-auto px-4">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Discussion ({{object.comments.count}})</h2>
+        <a href="{% url 'comment_create_view' object.pk %}" class="self-end relative inline-flex items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Add comment</a>
+      </div>
+      {% for comment in object.comments.all %}
+      <article class="p-6 text-base bg-white border-t border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+        <footer class="flex justify-between items-center mb-2">
+        <div class="flex items-center">
+          <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white font-semibold">{{comment.creator.username}}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400"><time pubdate datetime="2022-06-23"
+            title="June 23rd, 2022">{{comment.created_at}}</time></p>
+        </div>
+        <div class="flex space-x-2">
+          {% has_perm "comments.change_comment" user comment as can_update_comment %}
+          {% if can_update_comment %}
+          <a href="{% url 'comment_update_view' object.pk comment.pk %}" class="border-2 border-indigo-500 items-center rounded-md  px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Edit</a>
+          {% endif %}
+          {% has_perm "comments.delete_comment" user comment as can_delete_comment %}
+          {% if can_delete_comment %}
+          <form method="post" action="{% url 'comment_delete_view' object.pk comment.pk%}">
+            {% csrf_token %}
+            <button type="submit" class="items-center rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Delete</button>
+          </form>
+          {% endif %}
+        </div>
+				</footer>
+        <p class="text-gray-500 dark:text-gray-400">{{comment.comment}}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+</div>
 {% endblock %}
+
