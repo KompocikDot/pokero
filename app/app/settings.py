@@ -120,7 +120,9 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if not DEBUG:
+IS_REAL_PRODUCTION = not DEBUG and os.environ.get('CI') != 'true'
+
+if IS_REAL_PRODUCTION:
 
     DATABASES = {
         'default': {
@@ -207,14 +209,9 @@ TAILWIND_APP_NAME = "theme"
 
 if not DEBUG:
     # 1. Ochrona Ciasteczek (Naprawia: Cookie No HttpOnly Flag)
-    # Zapobiega wykradaniu sesji przez skrypty JS (XSS)
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
 
-    # UWAGA: Włączaj flagi SECURE tylko jeśli masz HTTPS.
-    # W CI/CD (localhost) ZAP testuje po HTTP, więc włączenie tego
-    # sprawi, że logowanie przestanie działać (ciasteczko zostanie odrzucone).
-    # Na "prawdziwej produkcji" z domeną i kłódką SSL odkomentuj te linie:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
@@ -223,24 +220,34 @@ if not DEBUG:
 
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+    if os.environ.get('CI') == 'true':
+        SECURE_SSL_REDIRECT = False
+        SESSION_COOKIE_SECURE = False
+        CSRF_COOKIE_SECURE = False
+        SECURE_HSTS_SECONDS = 0
+        SECURE_PROXY_SSL_HEADER = None
+
     # 2. Izolacja Strony (Naprawia: Insufficient Site Isolation / Spectre)
     # Wymaga Django 4.0+
     SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 
-    # 3. Content Security Policy (Naprawia: CSP Header Not Set)
-    # Konfiguracja biblioteki django-csp
-CONTENT_SECURITY_POLICY = {
-    "DIRECTIVES": {
-        "default-src": ["'self'"],
-        "script-src": ["'self'"],
-        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-        "img-src": ["'self'", "data:", "https://igamingpolska.pl", "https://tailwindcss.com"],
-        "font-src": ["'self'", "https://fonts.gstatic.com"],
-        "connect-src": ["'self'"], 
-        "frame-src": ["'self'"],
-        "object-src": ["'none'"],
-        "base-uri": ["'self'"],
+    CONTENT_SECURITY_POLICY = {
+    'DIRECTIVES': {
+        'default-src': ("'self'",),
+        'script-src': ("'self'",),
+        'style-src': ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com"),
+        'img-src': ("'self'", "data:", "https://igamingpolska.pl", "https://tailwindcss.com"),
+        'font-src': ("'self'", "https://fonts.gstatic.com"),
+        'connect-src': ("'self'",),
+        'frame-src': ("'self'",),
+        'object-src': ("'none'",),
+        'base-uri': ("'self'",),
+        }
     }
-}
+
 if not DEBUG:
     CSRF_TRUSTED_ORIGINS = ["https://pokerteki.mom"]
+
+    if os.environ.get('CI') == 'true':
+        CSRF_TRUSTED_ORIGINS.append("http://localhost:8000")
+        CSRF_TRUSTED_ORIGINS.append("http://127.0.0.1:8000")
