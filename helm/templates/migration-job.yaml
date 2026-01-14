@@ -1,3 +1,4 @@
+{{- if false }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -25,7 +26,7 @@ spec:
           
           env:
             - name: POSTGRES_HOST
-              value: {{ .Values.app.env.postgres_host }}
+              value: "{{ .Release.Name }}-db-cluster" 
             - name: POSTGRES_PORT
               value: {{ .Values.app.env.postgres_port | quote }}
             - name: POSTGRES_USER
@@ -33,7 +34,7 @@ spec:
             - name: POSTGRES_DB
               value: {{ .Values.app.env.postgres_db }}
             - name: POSTGRES_PASSWORD_FILE
-              value: /etc/secrets/db_password
+              value: /etc/db-secrets/password
             - name: SECRET_KEY_FILE
               value: /etc/secrets/secret_key
           
@@ -41,8 +42,15 @@ spec:
             - name: secrets
               mountPath: /etc/secrets
               readOnly: true
+            - name: db-credentials
+              mountPath: /etc/db-secrets
+              readOnly: true
       
       volumes:
         - name: secrets
           secret:
             secretName: pokero-secrets
+        - name: db-credentials
+          secret:
+            secretName: {{ .Values.app.env.postgres_user }}.{{ .Release.Name }}-db-cluster.credentials.postgresql.acid.zalan.do
+{{- end }}

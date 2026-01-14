@@ -30,7 +30,7 @@ spec:
         - name: django
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           securityContext:
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: true 
             runAsNonRoot: true
             runAsUser: 1000
             runAsGroup: 1000
@@ -56,7 +56,9 @@ spec:
             - name: PRODUCTION
               value: {{ .Values.app.env.production | quote }}
             - name: POSTGRES_HOST
-              value: {{ .Values.app.env.postgres_host }}
+              value: "{{ .Release.Name }}-db-cluster" 
+            - name: POSTGRES_HOST_REPLICA
+              value: "{{ .Release.Name }}-db-cluster-repl"
             - name: POSTGRES_PORT
               value: {{ .Values.app.env.postgres_port | quote }}
             - name: POSTGRES_USER
@@ -64,7 +66,7 @@ spec:
             - name: POSTGRES_DB
               value: {{ .Values.app.env.postgres_db }}
             - name: POSTGRES_PASSWORD_FILE
-              value: /etc/secrets/db_password
+              value: /etc/db-secrets/password
             - name: SECRET_KEY_FILE
               value: /etc/secrets/secret_key
             - name: ALLOWED_HOSTS
@@ -77,6 +79,9 @@ spec:
               mountPath: /tmp
             - name: static-volume
               mountPath: /backend/app/staticfiles
+            - name: db-credentials
+              mountPath: /etc/db-secrets
+              readOnly: true
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets | first | pluck "name" | first }}
       volumes:
@@ -87,3 +92,6 @@ spec:
           emptyDir: {}
         - name: static-volume
           emptyDir: {}
+        - name: db-credentials
+          secret:
+            secretName: {{ .Values.app.env.postgres_user }}.{{ .Release.Name }}-db-cluster.credentials.postgresql.acid.zalan.do
