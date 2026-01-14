@@ -120,7 +120,9 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if not DEBUG:
+IS_REAL_PRODUCTION = not DEBUG and os.environ.get('CI') != 'true'
+
+if IS_REAL_PRODUCTION:
 
     DATABASES = {
         'default': {
@@ -246,3 +248,7 @@ CONTENT_SECURITY_POLICY = {
 }
 if not DEBUG:
     CSRF_TRUSTED_ORIGINS = ["https://pokerteki.mom"]
+
+    if os.environ.get('CI') == 'true':
+        CSRF_TRUSTED_ORIGINS.append("http://localhost:8000")
+        CSRF_TRUSTED_ORIGINS.append("http://127.0.0.1:8000")
