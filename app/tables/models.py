@@ -6,11 +6,11 @@ from rules.contrib.models import RulesModel
 
 @rules.predicate
 def is_table_dealer(user, table):
-    return user == table.dealer
+    return user == table.dealer or user == table.creator
 
 @rules.predicate
 def is_table_dealer_or_game_player(user, table):
-    return user == table.dealer or table.games.filter(players__pk=user.pk).exists()
+    return user == table.dealer or user == table.creator or table.games.filter(players__pk=user.pk).exists()
 
 class Table(RulesModel):
     class Meta:
@@ -26,6 +26,12 @@ class Table(RulesModel):
         on_delete=models.SET_NULL,
         null=True,
         related_name='dealing_tables',
+    )
+    
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     play_date = models.DateTimeField(auto_now_add=True)

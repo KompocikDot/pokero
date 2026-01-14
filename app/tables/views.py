@@ -23,6 +23,11 @@ class TablesCreateView(LoginRequiredMixin, CreateView):
     fields = "__all__"
     template_name_suffix = "_create_form"
 
+    def form_valid(self, form):
+        form.instance.creator = self.request.user
+
+        return super().form_valid(form)
+
 class TableDeleteView(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
     model = Table
     success_url = reverse_lazy('tables_list_view')
