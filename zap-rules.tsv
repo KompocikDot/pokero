@@ -1,0 +1,9 @@
+10031	IGNORE	Django Admin safely handles the 'next' parameter (False Positive).
+10036	IGNORE	Server headers are standard in CI/Docker; Nginx handles this on Prod.
+10049	IGNORE	Cache headers on login/static files are handled correctly by Django/Whitenoise.
+10055	IGNORE	CSP is configured via middleware; ZAP strictness on static files/fallbacks is excessive here.
+10063	IGNORE	Permissions Policy is added via middleware; ignoring static file misses.
+10098	IGNORE	CORS on static files in Dev/CI environment is expected behavior.
+10111	IGNORE	Informational alert: Authentication mechanism identified.
+10112	IGNORE	Informational alert: Session management identified.
+90004	IGNORE	COEP disabled to allow loading external images. 
