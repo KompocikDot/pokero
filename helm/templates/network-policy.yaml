@@ -4,7 +4,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "pokero.fullname" . }}-default-deny
+  name: {{ .Release.Name }}-default-deny
 spec:
   podSelector: {}
   policyTypes:
@@ -16,7 +16,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "pokero.fullname" . }}-allow-dns
+  name: {{ .Release.Name }}-allow-dns
 spec:
   podSelector:
     matchLabels:
@@ -39,7 +39,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "pokero.fullname" . }}-allow-ingress
+  name: {{ .Release.Name }}-allow-ingress
 spec:
   podSelector:
     matchLabels:
@@ -60,7 +60,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "pokero.fullname" . }}-app-to-db
+  name: {{ .Release.Name }}-app-to-db
 spec:
   podSelector:
     matchLabels:
@@ -81,7 +81,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "pokero.fullname" . }}-db-allow-app
+  name: {{ .Release.Name }}-db-allow-app
 spec:
   podSelector:
     matchLabels:
@@ -102,7 +102,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ include "pokero.fullname" . }}-allow-monitoring
+  name: {{ .Release.Name }}-allow-monitoring
 spec:
   podSelector: {}
   policyTypes:
