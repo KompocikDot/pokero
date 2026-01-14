@@ -192,11 +192,13 @@ if not DEBUG:
     # W CI/CD (localhost) ZAP testuje po HTTP, więc włączenie tego
     # sprawi, że logowanie przestanie działać (ciasteczko zostanie odrzucone).
     # Na "prawdziwej produkcji" z domeną i kłódką SSL odkomentuj te linie:
-    # SESSION_COOKIE_SECURE = True
-    # CSRF_COOKIE_SECURE = True
-    # SECURE_SSL_REDIRECT = True
-    # SECURE_HSTS_SECONDS = 31536000
-    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
     # 2. Izolacja Strony (Naprawia: Insufficient Site Isolation / Spectre)
     # Wymaga Django 4.0+
