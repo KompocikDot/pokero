@@ -108,8 +108,15 @@ kubectl label configmap grafana-dashboard-pods \
   --overwrite
 ```
 
-## Run kubernetes nodes cis benchmark
+## Zalando operator 
 
-```bash
-kubectl apply -f infra/kube-bench.yaml
 ```
+helm repo add postgres-operator-charts https://opensource.zalando.com/postgres-operator/charts/postgres-operator
+helm repo update
+
+helm install postgres-operator postgres-operator-charts/postgres-operator \
+  --namespace default \
+  --set configKubernetes.enable_pod_antiaffinity=false \
+  --set configKubernetes.enable_pod_disruption_budget=false
+```
+
