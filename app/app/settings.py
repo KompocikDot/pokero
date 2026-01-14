@@ -233,19 +233,17 @@ if not DEBUG:
 
     # 3. Content Security Policy (Naprawia: CSP Header Not Set)
     # Konfiguracja biblioteki django-csp
-CONTENT_SECURITY_POLICY = {
-    "DIRECTIVES": {
-        "default-src": ["'self'"],
-        "script-src": ["'self'"],
-        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-        "img-src": ["'self'", "data:", "https://igamingpolska.pl", "https://tailwindcss.com"],
-        "font-src": ["'self'", "https://fonts.gstatic.com"],
-        "connect-src": ["'self'"], 
-        "frame-src": ["'self'"],
-        "object-src": ["'none'"],
-        "base-uri": ["'self'"],
-    }
-}
+    CSP_DEFAULT_SRC = ("'self'",)
+    CSP_SCRIPT_SRC = ("'self'",)
+    # Do stylów dodajemy unsafe-inline, bo Tailwind/Theme tego często wymaga
+    CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://fonts.googleapis.com")
+    CSP_IMG_SRC = ("'self'", "data:", "https://igamingpolska.pl", "https://tailwindcss.com")
+    CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
+    CSP_CONNECT_SRC = ("'self'",)
+    CSP_FRAME_SRC = ("'self'",)
+    CSP_OBJECT_SRC = ("'none'",)
+    CSP_BASE_URI = ("'self'",)
+
 if not DEBUG:
     CSRF_TRUSTED_ORIGINS = ["https://pokerteki.mom"]
 
