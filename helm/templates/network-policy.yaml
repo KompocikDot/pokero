@@ -51,7 +51,7 @@ spec:
           kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingressNamespace }}
     ports:
     - protocol: TCP
-      port: {{ .Values.service.port | default 8000 }}
+      port: 8000
 
 ---
 # 4. APP -> DB
