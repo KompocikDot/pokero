@@ -126,9 +126,17 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB'),
         'USER': os.environ.get('POSTGRES_USER'),
         'PASSWORD': read_secret(os.environ.get("POSTGRES_PASSWORD_FILE"))
-    }
+    },
+    'replica': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': os.environ.get('POSTGRES_HOST_REPLICA'),
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': read_secret(os.environ.get("POSTGRES_PASSWORD_FILE"))
+     }
 }
 
+DATABASE_ROUTERS = ['app.db_router.PrimaryReplicaRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
