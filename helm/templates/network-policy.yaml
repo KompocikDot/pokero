@@ -1,9 +1,10 @@
-# 1. DEFAULT DENY
+{{- if .Values.networkPolicy.enabled -}}
+
+# 1. Default Deny
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: default-deny-all
-  namespace: default
+  name: {{ include "pokero.fullname" . }}-default-deny
 spec:
   podSelector: {}
   policyTypes:
@@ -11,17 +12,18 @@ spec:
   - Egress
 
 ---
-# 2. ALLOWED DNS 
+# 2. DNS 
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-dns-egress
-  namespace: default
+  name: {{ include "pokero.fullname" . }}-allow-dns
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app: pokero-app
   policyTypes:
   - Egress
-  egress:  
+  egress:
   - to:
     - namespaceSelector:
         matchLabels:
@@ -37,38 +39,35 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-ingress-to-app
-  namespace: default
+  name: {{ include "pokero.fullname" . }}-allow-ingress
 spec:
   podSelector:
     matchLabels:
       app: pokero-app
   policyTypes:
   - Ingress
-  ingress: 
+  ingress:
   - from:
     - namespaceSelector:
         matchLabels:
-          kubernetes.io/metadata.name: ingress-nginx
+          kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingressNamespace }}
     ports:
     - protocol: TCP
-      port: 8000
+      port: {{ .Values.service.port | default 8000 }}
 
 ---
-#  4. APP <-> DATABASE 
-# Part A: App to pokero-db
+# 4. APP -> DB 
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-app-to-db
-  namespace: default
+  name: {{ include "pokero.fullname" . }}-app-to-db
 spec:
   podSelector:
     matchLabels:
       app: pokero-app
   policyTypes:
   - Egress
-  egress: 
+  egress:
   - to:
     - podSelector:
         matchLabels:
@@ -78,19 +77,18 @@ spec:
       port: 5432
 
 ---
-# Part B: Base (pokero-db) 
+# 5. DB <- APP (ingress to db)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-db-ingress
-  namespace: default
+  name: {{ include "pokero.fullname" . }}-db-allow-app
 spec:
   podSelector:
     matchLabels:
       app: pokero-db
   policyTypes:
   - Ingress
-  ingress: 
+  ingress:
   - from:
     - podSelector:
         matchLabels:
@@ -100,21 +98,20 @@ spec:
       port: 5432
 
 ---
-# --- 5. MONITORING ---
+# 6. MONITORING 
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-monitoring-scraping
-  namespace: default
+  name: {{ include "pokero.fullname" . }}-allow-monitoring
 spec:
   podSelector: {}
   policyTypes:
   - Ingress
-  ingress: 
+  ingress:
   - from:
     - namespaceSelector:
         matchLabels:
-          kubernetes.io/metadata.name: monitoring
+          kubernetes.io/metadata.name: {{ .Values.networkPolicy.monitoringNamespace }}
     ports:
     - protocol: TCP
       port: 8000
@@ -122,3 +119,4 @@ spec:
       port: 9100
     - protocol: TCP
       port: 5432
+{{- end }}

@@ -42,7 +42,11 @@ db:
 imagePullSecrets:
   - name: ghcr-secret
 
-
+# Network policies
+networkPolicy:
+  enabled: true                 
+  ingressNamespace: "ingress-nginx"  
+  monitoringNamespace: "monitoring"  
 
 autoscaling:
   enabled: true
