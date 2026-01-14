@@ -11,7 +11,7 @@ class TablesListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user = self.request.user
         return Table.objects.filter(
-            Q(dealer=user) | Q(games__players=user)
+            Q(dealer=user) | Q(games__players=user) | Q(creator=user)
         ).distinct()
 
 class TableObjectView(PermissionRequiredMixin, LoginRequiredMixin, DetailView):
@@ -20,7 +20,7 @@ class TableObjectView(PermissionRequiredMixin, LoginRequiredMixin, DetailView):
 
 class TablesCreateView(LoginRequiredMixin, CreateView):
     model = Table
-    fields = "__all__"
+    fields = ["name", "dealer"]
     template_name_suffix = "_create_form"
 
     def form_valid(self, form):
