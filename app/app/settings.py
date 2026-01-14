@@ -207,14 +207,9 @@ TAILWIND_APP_NAME = "theme"
 
 if not DEBUG:
     # 1. Ochrona Ciasteczek (Naprawia: Cookie No HttpOnly Flag)
-    # Zapobiega wykradaniu sesji przez skrypty JS (XSS)
     SESSION_COOKIE_HTTPONLY = True
     CSRF_COOKIE_HTTPONLY = True
 
-    # UWAGA: Włączaj flagi SECURE tylko jeśli masz HTTPS.
-    # W CI/CD (localhost) ZAP testuje po HTTP, więc włączenie tego
-    # sprawi, że logowanie przestanie działać (ciasteczko zostanie odrzucone).
-    # Na "prawdziwej produkcji" z domeną i kłódką SSL odkomentuj te linie:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
@@ -222,6 +217,13 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    if os.environ.get('CI') == 'true':
+        SECURE_SSL_REDIRECT = False
+        SESSION_COOKIE_SECURE = False
+        CSRF_COOKIE_SECURE = False
+        SECURE_HSTS_SECONDS = 0
+        SECURE_PROXY_SSL_HEADER = None
 
     # 2. Izolacja Strony (Naprawia: Insufficient Site Isolation / Spectre)
     # Wymaga Django 4.0+

@@ -55,6 +55,7 @@ services:
              python manage.py runserver 0.0.0.0:8000"
 
     environment:
+      CI: ${CI}
       PRODUCTION: true
       POSTGRES_HOST: db
       POSTGRES_USER: pokero
@@ -71,7 +72,7 @@ services:
 
 
   db:
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     environment:
       POSTGRES_USER: pokero
       POSTGRES_DB: pokero
