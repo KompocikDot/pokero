@@ -107,3 +107,9 @@ kubectl label configmap grafana-dashboard-pods \
   grafana_dashboard=1 \
   --overwrite
 ```
+
+## Run kubernetes nodes cis benchmark
+
+```bash
+kubectl apply -f infra/kube-bench.yaml
+```
