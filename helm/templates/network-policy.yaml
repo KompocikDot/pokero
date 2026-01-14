@@ -1,6 +1,6 @@
 {{- if .Values.networkPolicy.enabled -}}
 
-# 1. Default Deny
+# 1. DEFAULT DENY
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -18,9 +18,7 @@ kind: NetworkPolicy
 metadata:
   name: {{ .Release.Name }}-allow-dns
 spec:
-  podSelector:
-    matchLabels:
-      app: pokero-app
+  podSelector: {} 
   policyTypes:
   - Egress
   egress:
@@ -35,7 +33,7 @@ spec:
       port: 53
 
 ---
-# 3. INGRESS -> APP 
+# 3. INGRESS -> APP
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -53,10 +51,10 @@ spec:
           kubernetes.io/metadata.name: {{ .Values.networkPolicy.ingressNamespace }}
     ports:
     - protocol: TCP
-      port: 8000
+      port: {{ .Values.service.port | default 8000 }}
 
 ---
-# 4. APP -> DB 
+# 4. APP -> DB
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -71,24 +69,26 @@ spec:
   - to:
     - podSelector:
         matchLabels:
-          app: pokero-db
+          cluster-name: pokero-db-cluster 
     ports:
     - protocol: TCP
       port: 5432
 
----
-# 5. DB <- APP (ingress to db)
+# 5. Policy for DB cluster (Zalando/Spilo)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ .Release.Name }}-db-allow-app
+  name: {{ .Release.Name }}-db-cluster-policy
 spec:
   podSelector:
     matchLabels:
-      app: pokero-db
+      cluster-name: pokero-db-cluster 
   policyTypes:
   - Ingress
+  - Egress
+
   ingress:
+  # A. Django app
   - from:
     - podSelector:
         matchLabels:
@@ -96,6 +96,54 @@ spec:
     ports:
     - protocol: TCP
       port: 5432
+
+  # Master talk to replica
+  - from:
+    - podSelector:
+        matchLabels:
+          cluster-name: pokero-db-cluster
+    ports:
+    - protocol: TCP
+      port: 5432 
+    - protocol: TCP
+      port: 8008 
+
+  # C. Operator 
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: postgres-operator
+    ports:
+    - protocol: TCP
+      port: 8008 # Patroni API
+    - protocol: TCP
+      port: 5432
+
+  # D. Monitoring
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: {{ .Values.networkPolicy.monitoringNamespace }}
+
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          cluster-name: pokero-db-cluster
+    ports:
+    - protocol: TCP
+      port: 5432
+    - protocol: TCP
+      port: 8008
+
+  # B. Do K8S API 
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+    ports:
+    - protocol: TCP
+      port: 443
 
 ---
 # 6. MONITORING 
