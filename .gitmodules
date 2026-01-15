@@ -1,0 +1,3 @@
+[submodule "pokero_infra"]
+	path = pokero_infra
+	url = git@github.com:camyk991/pokero_infra.git
