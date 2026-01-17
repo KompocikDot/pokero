@@ -2,7 +2,13 @@ name: Docker Publish
 
 on:
   push:
-    branches: [ "main", "miszi" ]
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'zap-rules.tsv'
+      - '.semgrepignore'
+      - '.gitmodules'
+      - '.gitignore'
 
 jobs:
   gitleaks:
