@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "comments",
     'csp',
     "rules",
+    "axes",
 ]
 
 if DEBUG:
@@ -83,6 +84,7 @@ MIDDLEWARE = [
     'app.middleware.SecurityHeadersMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
 ]
 
 
@@ -93,6 +95,7 @@ if DEBUG:
     ]
 
 AUTHENTICATION_BACKENDS = (
+    'axes.backends.AxesStandaloneBackend',
     'rules.permissions.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -251,3 +254,55 @@ if not DEBUG:
     if os.environ.get('CI') == 'true':
         CSRF_TRUSTED_ORIGINS.append("http://localhost:8000")
         CSRF_TRUSTED_ORIGINS.append("http://127.0.0.1:8000")
+
+# ---  AXES Configuration (Brute Force Protection) ---
+
+
+AXES_FAILURE_LIMIT = 5
+
+# Ban time
+AXES_COOLOFF_TIME = 1  # hours 
+
+AXES_RESET_ON_SUCCESS = True
+
+AXES_LOCKOUT_TEMPLATE = None 
+AXES_LOCKOUT_PARAMETERS = ["username", "ip_address"]
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} {levelname} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+        'axes': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'app': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
