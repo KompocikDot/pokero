@@ -268,6 +268,9 @@ AXES_RESET_ON_SUCCESS = True
 AXES_LOCKOUT_TEMPLATE = None 
 AXES_LOCKOUT_PARAMETERS = ["username", "ip_address"]
 
+AXES_MASK_IP = False
+AXES_MASK_USERNAME = False
+
 
 LOGGING = {
     'version': 1,
