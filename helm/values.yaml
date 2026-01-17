@@ -1,7 +1,7 @@
 # Image
 image:
   repository: ghcr.io/kompocikdot/pokero
-  tag: 67644c701d0eade17cc045bdf6d4ea78a7e9f2ba
+  tag: c0e8a7196f759f1c15989607338e19b52f265749
   pullPolicy: Always
 
 # App
