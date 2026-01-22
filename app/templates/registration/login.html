@@ -6,7 +6,7 @@
 {% block content %}
 <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
   <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-    <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" class="mx-auto h-10 w-auto" />
+    <svg class="mx-auto h-10 w-auto fill-indigo-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-badge-dollar-sign-icon lucide-badge-dollar-sign"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
     <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">Sign in to your account</h2>
   </div>
 
@@ -27,9 +27,6 @@
       <div>
         <div class="flex items-center justify-between">
           <label for="password" class="block text-sm/6 font-medium text-gray-100">Password</label>
-          <div class="text-sm">
-            <a href="{% url 'password_reset' %}" class="font-semibold text-indigo-400 hover:text-indigo-300">Forgot password?</a>
-          </div>
         </div>
         <div class="mt-2">
 	{% render_field form.password class+="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6" %}
