@@ -24,10 +24,6 @@ Run the application locally using Docker Compose with hot-reloading enabled.
 
 ### Running the Environment
 
-```bash
-docker compose --profile=dev up --build -d --watch
-```
-
 **Development Mode (Hot-reload, Debug ON):**
 ```bash
 docker compose --profile=dev up --build -d --watch
