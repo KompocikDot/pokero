@@ -10,6 +10,7 @@ To work with this project, ensure you have the following tools installed:
 - **Azure CLI** (`az login`)
 - **kubectl** (configured via `az aks get-credentials`)
 - **Helm 3** (Package manager for Kubernetes)
+- **UV** (Python package and project manager for development)
 
 ---
 
@@ -18,14 +19,18 @@ To work with this project, ensure you have the following tools installed:
 Run the application locally using Docker Compose with hot-reloading enabled.
 
 ### Local Secrets
-**Note:** The `secrets/` directory is used **only** for local development.
-Create a file named `db_password` inside the `secrets/` directory containing your local database password.
+> [!NOTE]
+> The `secrets/` directory is used **only** for local development. Create a file named `db_password` inside the `secrets/` directory containing your local database password.
 
 ### Running the Environment
 
+```bash
+docker compose --profile=dev up --build -d --watch
+```
+
 **Development Mode (Hot-reload, Debug ON):**
 ```bash
-docker compose --profile=dev up --build -d
+docker compose --profile=dev up --build -d --watch
 ```
 
 **Production Mode Simulation:**
@@ -45,6 +50,178 @@ docker exec -it $CONTAINER_ID python manage.py migrate
 
 # Create a Superuser (for Django Admin Panel)
 docker exec -it $CONTAINER_ID python manage.py createsuperuser
+```
+
+---
+
+## App Architecture
+
+The app itself is rather simple one made for both class project and personal use.
+Our goal was to manage our gambling addiction :wink: in neat way that does not require TUI/CLI and is
+highly available, secure and foolproof to use. Below you can find simplified diagram of app architecture.
+
+```mermaid
+graph TD
+    %% --- ACTORS ---
+    UserCreator(("User: Creator"))
+    UserDealer(("User: Selected Dealer"))
+    UserPlayer(("User: Player"))
+
+    %% --- STEP 1: TABLE CREATION ---
+    CreateTable["Create Table"]
+    TableObj["Object: Table"]
+    AssignDealer{"Who is the Dealer?"}
+
+    UserCreator --> CreateTable
+    CreateTable --> TableObj
+    CreateTable --> AssignDealer
+
+    %% Dealer Decision
+    AssignDealer -- "Self" --> RoleCreator["Role: Dealer (Creator)"]
+    AssignDealer -- "Other User" --> RoleOther["Role: Dealer (Other)"]
+    
+    %% Linking other user to role
+    RoleOther -.-> UserDealer
+
+    %% --- STEP 2: MANAGEMENT ---
+    %% Both Creator and Dealer have 'change' permissions
+    RoleCreator --> Management["Management (Edit / Add Games)"]
+    RoleOther --> Management
+
+    AddGame["Add Game"]
+    AddPlayer["Add Player to Game"]
+    GameObj["Object: Game"]
+
+    Management --> AddGame
+    Management --> AddPlayer
+    
+    AddGame --> GameObj
+    
+    %% Adding players
+    AddPlayer -- "Selects from DB" --> UserPlayer
+    UserPlayer -- "Added to" --> GameObj
+
+    %% --- STEP 3: ACCESS & INTERACTION ---
+    %% Read access logic
+    UserPlayer -.-> Access["READ Access (View Table)"]
+    Management -.-> Access
+    
+    Access --> TableObj
+    
+    %% Comments
+    Access --> Comment["Add Comment"]
+    Comment -- "Linked to" --> TableObj
+```
+
+### Used libraries, frameworks and tools
+> Our goal was to use as little external libraries as possible to minimize amount of code that can introduce vulnerabilities, but with **common sense** and **only** where it's not adding extra complexity.
+
+The core of our project is based on **Django** web framework. We've picked it beacuse it's:
+- batteries-included
+- robust and secure by default
+- flexibile and scalable,
+- easy to develop and use
+- comes with extensive documentation.
+
+But it's missing few features, so we've extended it with few libraries to enhance security, usability and development speed:
+- Django-axes - Brute-force attack prevention for Django applications.
+- Django-csp - Content Security Policy implementation for Django.
+
+> [!NOTE]
+> The CSP library could potentially be replaced with builit-in middleware added in Django 6.0, but at the time of development it was still not a stable release.
+
+- Django-tailwind - Integration of Tailwind CSS with Django.
+- Django-widget-tweaks - Allows customization of form field rendering in Django templates.
+- Django-rules - A rules engine for Django.
+
+To serve the application in both production and docker-compose context, we are using:
+- gunicorn - production-ready WSGI HTTP server.
+
+### Database schema
+
+Below is the diagram representing the database schema of the application, including models and their relationships.
+
+```mermaid
+erDiagram
+    %% Wbudowany User Django
+    User {
+        int id PK
+        string username
+        string email
+        string password
+        boolean is_staff
+        boolean is_active
+        datetime date_joined
+    }
+
+    %% Model Table
+    Table {
+        int id PK
+        string name
+        datetime play_date
+        int dealer_id FK "Nullable"
+        int creator_id FK "Nullable"
+    }
+
+    %% Model Comment
+    Comment {
+        int id PK
+        text comment
+        datetime created_at
+        int table_id FK
+        int creator_id FK "Nullable"
+    }
+
+    %% Model Game
+    Game {
+        int id PK
+        int table_id FK
+        int winner_id FK "Nullable"
+    }
+
+    %% Relacje dla Table
+    User ||--o{ Table : "dealer (dealing_tables)"
+    User ||--o{ Table : "creator"
+
+    %% Relacje dla Comment
+    Table ||--|{ Comment : "has (comments)"
+    User ||--o{ Comment : "creator"
+
+    %% Relacje dla Game
+    Table ||--o{ Game : "contains (games)"
+    User ||--o{ Game : "winner (won_games)"
+    
+    %% Relacja Many-to-Many (Gracze w grze)
+    Game }|--|{ User : "players (M2M)"
+```
+
+### Security measures
+
+As mentioned before, security was one of the main focus points of this project, and thankfully django provides a solid foundation for building secure applications. Here is the list of security measures implemented in the application out of the box.
+- **Secure cookies**: Ensuring cookies are marked as secure and HttpOnly to prevent client-side access.
+- **Input validation and sanitization**: All user inputs are validated and sanitized to prevent SQL injection and XSS attacks.
+- **Password hashing**: User passwords are hashed using Django's built-in password hashing mechanisms.
+- **CSRF protection**: Enabled by default in Django to protect against Cross-Site Request Forgery attacks.
+
+And custom ones:
+- **Content Security Policy (CSP)**: Implemented via Django-csp to mitigate XSS attacks.
+- **Brute-force protection**: Using Django-axes to monitor and block repeated failed login attempts.
+- **Least privilege principle**: Thanks to django-rules we were able to ensure that services and users have only the minimum permissions to models, views and templates necessary to perform their tasks.
+
+
+#### Django-Axes Configuration
+##### **Key Parameters**
+
+* **`AXES_FAILURE_LIMIT = 5`** Defines the maximum number of failed login attempts allowed before an IP address or user account is locked out.
+    * *Recommended values:* 3 (high security) to 10 (more user-friendly).
+* **`AXES_COOLOFF_TIME = 1`** The duration of the lockout in hours. After this period, the user can attempt to log in again.
+    * *Adjustment:* Can be increased to 24 (full day lockout) if persistent automated attacks are detected.
+* **`AXES_RESET_ON_SUCCESS = True`** When set to `True`, any successful login resets the failure counter to zero. This prevents legitimate users from being locked out if they eventually provide the correct password after a few typos.
+
+###### **Maintenance: Managing Lockouts**
+If a legitimate user is accidentally locked out or if you need to clear all lockout records (e.g. after internal testing), use the following management command:
+```bash
+python manage.py axes_reset
 ```
 
 ---
@@ -174,7 +351,8 @@ POD_NAME=$(kubectl get pod -l app=pokero-app -o jsonpath="{.items[0].metadata.na
 # 2. execute createsuperuser
 kubectl exec -it $POD_NAME -- python manage.py createsuperuser
 ```
-*(Note: Standard database migrations are handled automatically by a Helm Job during deployment).*
+> [!NOTE]
+> Standard database migrations are handled automatically by a Helm Job during deployment.
 
 ---
 
